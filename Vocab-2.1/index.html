@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luyện Từ Vựng Tiếng Hàn - Chủ Đề Địa Điểm</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+        .bounce-gentle {
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <!-- Header Navbar -->
+    <header class="bg-indigo-600 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-2">
+            <div class="flex items-center space-x-3">
+                <span class="text-3xl">🇰🇷</span>
+                <div>
+                    <h1 class="font-bold text-lg md:text-xl leading-tight">Học Từ Vựng Tiếng Hàn</h1>
+                    <p class="text-xs text-indigo-200">Chủ đề: Các địa điểm thông dụng (장소)</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2 bg-indigo-700/60 px-3 py-1.5 rounded-xl border border-indigo-500/40 text-sm">
+                <i class="fas fa-trophy text-amber-300 text-base"></i>
+                <span>Điểm: <strong id="total-score" class="text-amber-300 font-bold text-base">0</strong></span>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="max-w-5xl mx-auto px-4 flex overflow-x-auto gap-2 py-2 border-t border-indigo-500/30 no-scrollbar text-sm">
+            <button onclick="switchTab('study')" id="tab-study" class="tab-btn active-tab bg-white text-indigo-700 font-bold px-4 py-2 rounded-lg flex items-center gap-2 shrink-0 shadow-sm transition">
+                <i class="fas fa-book-open"></i> 1. Ôn Từ Vựng
+            </button>
+            <button onclick="switchTab('matching')" id="tab-matching" class="tab-btn bg-indigo-700/50 hover:bg-indigo-700 text-indigo-100 font-semibold px-4 py-2 rounded-lg flex items-center gap-2 shrink-0 transition">
+                <i class="fas fa-project-diagram"></i> 2. Nối Từ (2 Lượt)
+            </button>
+            <button onclick="switchTab('listening')" id="tab-listening" class="tab-btn bg-indigo-700/50 hover:bg-indigo-700 text-indigo-100 font-semibold px-4 py-2 rounded-lg flex items-center gap-2 shrink-0 transition">
+                <i class="fas fa-volume-up"></i> 3. Luyện Nghe (12 Câu)
+            </button>
+            <button onclick="switchTab('visual')" id="tab-visual" class="tab-btn bg-indigo-700/50 hover:bg-indigo-700 text-indigo-100 font-semibold px-4 py-2 rounded-lg flex items-center gap-2 shrink-0 transition">
+                <i class="fas fa-images"></i> 4. Trắc Nghiệm Hình Ảnh (12 Câu)
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-5xl mx-auto px-4 py-6 w-full flex-grow">
+
+        <!-- TAB 1: STUDY / FLASHCARDS -->
+        <section id="sec-study" class="space-y-6">
+            <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-xl font-bold text-indigo-900 flex items-center gap-2">
+                        <i class="fas fa-graduation-cap text-indigo-600"></i> Danh Sách 12 Từ Vựng Địa Điểm
+                    </h2>
+                    <p class="text-sm text-indigo-700 mt-1">Bấm nút loa để nghe giọng đọc chuẩn Hangul (ko-KR) hoặc lật thẻ để ghi nhớ.</p>
+                </div>
+                <button onclick="playAllAudio()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl shadow transition flex items-center gap-2 text-sm shrink-0">
+                    <i class="fas fa-play-circle"></i> Nghe lần lượt tất cả
+                </button>
+            </div>
+
+            <!-- Flashcards Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4" id="flashcards-grid">
+                <!-- Injected dynamically via JS -->
+            </div>
+        </section>
+
+        <!-- TAB 2: MATCHING GAME -->
+        <section id="sec-matching" class="hidden space-y-6">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div>
+                    <span id="matching-round-badge" class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-bold uppercase tracking-wider">Lượt 1 / 2</span>
+                    <h2 class="text-xl font-bold text-slate-800 mt-1">Nối Từ Tiếng Hàn Với Nghĩa Tiếng Việt</h2>
+                    <p class="text-xs text-slate-500">Bấm chọn 1 từ tiếng Hàn ở cột trái, sau đó chọn nghĩa tương ứng ở cột phải.</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-sm font-medium text-slate-600">Đã nối: <strong id="matching-progress" class="text-indigo-600">0/6</strong></span>
+                    <button onclick="initMatchingGame(1)" class="px-3 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg transition">
+                        <i class="fas fa-redo"></i> Chơi lại
+                    </button>
+                </div>
+            </div>
+
+            <!-- Matching Columns -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 min-h-[380px]">
+                <!-- Left Column (Korean) -->
+                <div class="space-y-3">
+                    <h3 class="font-bold text-slate-600 text-center pb-2 border-b border-slate-100">Tiếng Hàn (한국어)</h3>
+                    <div id="matching-left" class="space-y-3"></div>
+                </div>
+
+                <!-- Right Column (Vietnamese) -->
+                <div class="space-y-3">
+                    <h3 class="font-bold text-slate-600 text-center pb-2 border-b border-slate-100">Tiếng Việt</h3>
+                    <div id="matching-right" class="space-y-3"></div>
+                </div>
+            </div>
+
+            <!-- Round completion panel -->
+            <div id="matching-next-round-panel" class="hidden bg-emerald-50 border border-emerald-200 p-6 rounded-2xl text-center space-y-3">
+                <div class="text-emerald-600 text-4xl"><i class="fas fa-check-circle"></i></div>
+                <h3 class="text-xl font-bold text-emerald-900">Xuất sắc! Bạn đã hoàn thành Lượt 1!</h3>
+                <p class="text-emerald-700 text-sm">Hãy tiếp tục Lượt 2 để nối 6 từ vựng địa điểm còn lại.</p>
+                <button onclick="initMatchingGame(2)" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md transition inline-flex items-center gap-2">
+                    Sang Lượt 2 <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- TAB 3: LISTENING EXERCISE -->
+        <section id="sec-listening" class="hidden space-y-6">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex justify-between items-center">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800">Nghe Phát Âm Chọn Từ Vựng Đúng</h2>
+                    <p class="text-xs text-slate-500">Giọng phát âm chuẩn Hangul. Bao gồm 12 câu hỏi covering toàn bộ từ vựng.</p>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs font-semibold text-slate-400 block">Tiến độ</span>
+                    <span id="listening-step" class="text-lg font-bold text-indigo-600">1 / 12</span>
+                </div>
+            </div>
+
+            <!-- Audio Player & Question Card -->
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 text-center space-y-6 max-w-2xl mx-auto">
+                <div class="space-y-3">
+                    <button id="listen-audio-btn" onclick="playCurrentListeningAudio()" class="w-24 h-24 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg hover:scale-105 active:scale-95 transition flex items-center justify-center mx-auto text-3xl group">
+                        <i class="fas fa-volume-up group-hover:animate-pulse"></i>
+                    </button>
+                    <p class="text-sm font-semibold text-indigo-700">Bấm vào loa để nghe từ vựng</p>
+                </div>
+
+                <!-- Multiple Choice Options -->
+                <div id="listening-options" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
+                    <!-- Options injected via JS -->
+                </div>
+
+                <!-- Explanation / Feedback Banner -->
+                <div id="listening-feedback" class="hidden p-4 rounded-xl text-center font-bold text-sm"></div>
+
+                <!-- Next Button -->
+                <div class="pt-2 flex justify-end">
+                    <button id="listening-next-btn" onclick="nextListeningQuestion()" class="hidden px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition">
+                        Câu tiếp theo <i class="fas fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: VISUAL / IMAGE QUIZ -->
+        <section id="sec-visual" class="hidden space-y-6">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex justify-between items-center">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800">Trắc Nghiệm Hình Ảnh & Mô Tả</h2>
+                    <p class="text-xs text-slate-500">Quan sát biểu tượng / ngữ cảnh địa điểm và chọn từ tiếng Hàn phù hợp nhất.</p>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs font-semibold text-slate-400 block">Tiến độ</span>
+                    <span id="visual-step" class="text-lg font-bold text-indigo-600">1 / 12</span>
+                </div>
+            </div>
+
+            <!-- Visual Quiz Card -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 max-w-2xl mx-auto space-y-6">
+                <!-- Visual Display Box -->
+                <div id="visual-display" class="bg-gradient-to-br from-indigo-500 to-purple-600 text-white p-8 rounded-2xl text-center space-y-3 shadow-inner">
+                    <div id="visual-icon" class="text-6xl bounce-gentle">🏫</div>
+                    <p id="visual-desc" class="text-sm md:text-base font-medium opacity-90">Nơi học sinh đến trường học tập mỗi ngày.</p>
+                </div>
+
+                <!-- Multiple Choice Options -->
+                <div id="visual-options" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <!-- Options injected via JS -->
+                </div>
+
+                <!-- Feedback -->
+                <div id="visual-feedback" class="hidden p-4 rounded-xl text-center font-bold text-sm"></div>
+
+                <!-- Next Button -->
+                <div class="pt-2 flex justify-end">
+                    <button id="visual-next-btn" onclick="nextVisualQuestion()" class="hidden px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition">
+                        Câu tiếp theo <i class="fas fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- RESULT MODAL / OVERLAY -->
+        <div id="result-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-3xl max-w-md w-full p-6 text-center space-y-5 shadow-2xl animate-fade-in">
+                <div class="w-20 h-20 bg-amber-100 text-amber-500 text-4xl rounded-full flex items-center justify-center mx-auto">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-black text-slate-800">Hoàn Thành Xuất Sắc!</h3>
+                    <p class="text-slate-500 text-sm mt-1" id="result-message">Bạn đã làm rất tốt các bài tập từ vựng!</p>
+                </div>
+
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 grid grid-cols-2 gap-3 text-center">
+                    <div>
+                        <span class="text-xs text-slate-400 block">Tổng Điểm</span>
+                        <span id="modal-score" class="text-2xl font-black text-indigo-600">0</span>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-400 block">Độ Chính Xác</span>
+                        <span id="modal-accuracy" class="text-2xl font-black text-emerald-600">100%</span>
+                    </div>
+                </div>
+
+                <div class="flex gap-3">
+                    <button onclick="closeResultModal()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow transition">
+                        Tiếp Tục Ôn Tập
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+        <p>Ứng dụng Luyện Từ Vựng Tiếng Hàn Sơ Cấp • Hỗ trợ phát âm chuẩn Hangul (ko-KR)</p>
+    </footer>
+
+    <script>
+        /* 12 Core Vocabulary Items with Standard Revised Romanization */
+        const VOCAB_DATA = [
+            { id: 1, kr: "학교", vi: "Trường học", roman: "hak-gyo", icon: "🏫", desc: "Nơi học sinh đến học tập mỗi ngày", hint: "Địa điểm dành cho học sinh, sinh viên" },
+            { id: 2, kr: "도서관", vi: "Thư viện", roman: "do-seo-gwan", icon: "📚", desc: "Nơi yên tĩnh để đọc và mượn sách", hint: "Nơi chứa rất nhiều sách và tài liệu" },
+            { id: 3, kr: "식당", vi: "Nhà ăn, nhà hàng", roman: "sik-dang", icon: "🍽️", desc: "Nơi phục vụ các món ăn và ăn uống", hint: "Nơi đến khi bạn cảm thấy đói bụng" },
+            { id: 4, kr: "호텔", vi: "Khách sạn", roman: "ho-tel", icon: "🏨", desc: "Nơi lưu trú nghỉ ngơi của khách du lịch", hint: "Nơi thuê phòng để ngủ khi đi du lịch" },
+            { id: 5, kr: "극장", vi: "Nhà hát, rạp phim", roman: "geuk-jang", icon: "🎬", desc: "Nơi thưởng thức phim ảnh và nghệ thuật", hint: "Nơi chiếu các bộ phim màn ảnh rộng" },
+            { id: 6, kr: "우체국", vi: "Bưu điện", roman: "u-che-guk", icon: "📮", desc: "Nơi chuyển phát thư từ và bưu phẩm", hint: "Nơi gửi thư, hàng hóa bưu kiện" },
+            { id: 7, kr: "병원", vi: "Bệnh viện", roman: "byeong-won", icon: "🏥", desc: "Nơi khám chữa bệnh và chăm sóc sức khỏe", hint: "Nơi có bác sĩ và y sĩ làm việc" },
+            { id: 8, kr: "은행", vi: "Ngân hàng", roman: "eun-haeng", icon: "🏦", desc: "Nơi thực hiện giao dịch tài chính, tiền tệ", hint: "Nơi gửi tiết kiệm hoặc rút tiền" },
+            { id: 9, kr: "백화점", vi: "Trung tâm mua sắm cao cấp", roman: "baek-hwa-jeom", icon: "🛍️", desc: "Tòa nhà lớn với nhiều gian hàng thời trang cao cấp", hint: "Nơi mua sắm hàng hiệu sầm uất" },
+            { id: 10, kr: "약국", vi: "Hiệu thuốc", roman: "yak-guk", icon: "💊", desc: "Nơi bán các loại thuốc chữa bệnh", hint: "Nơi mua thuốc khi bị đau ốm nhẹ" },
+            { id: 11, kr: "가게", vi: "Cửa tiệm, cửa hàng", roman: "ga-ge", icon: "🏪", desc: "Nơi bán các nhu yếu phẩm hàng ngày", hint: "Cửa hàng bán đồ tạp hóa nhỏ" },
+            { id: 12, kr: "사무실", vi: "Văn phòng", roman: "sa-mu-sil", icon: "🏢", desc: "Nơi làm việc của nhân viên công ty", hint: "Nơi có bàn làm việc và máy tính công ty" }
+        ];
+
+        // Global State
+        let score = 0;
+        let selectedTab = 'study';
+
+        // Speech Synthesis Setup
+        const synth = window.speechSynthesis;
+        let koreanVoice = null;
+
+        function loadVoices() {
+            if (!synth) return;
+            const voices = synth.getVoices();
+            koreanVoice = voices.find(v => v.lang.includes('ko') || v.lang.includes('KO')) || null;
+        }
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = loadVoices;
+        }
+        loadVoices();
+
+        function speakKorean(text) {
+            if (!synth) {
+                alert("Trình duyệt của bạn không hỗ trợ tính năng phát âm.");
+                return;
+            }
+            synth.cancel(); // Stop ongoing speech
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ko-KR';
+            utterance.rate = 0.85; // Slightly slower for clear learning
+            if (koreanVoice) {
+                utterance.voice = koreanVoice;
+            }
+            synth.speak(utterance);
+        }
+
+        function updateScore(points) {
+            score += points;
+            document.getElementById('total-score').textContent = score;
+        }
+
+        function switchTab(tabId) {
+            selectedTab = tabId;
+            const tabs = ['study', 'matching', 'listening', 'visual'];
+            
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                const sec = document.getElementById(`sec-${t}`);
+                if (t === tabId) {
+                    btn.className = "tab-btn active-tab bg-white text-indigo-700 font-bold px-4 py-2 rounded-lg flex items-center gap-2 shrink-0 shadow-sm transition";
+                    sec.classList.remove('hidden');
+                } else {
+                    btn.className = "tab-btn bg-indigo-700/50 hover:bg-indigo-700 text-indigo-100 font-semibold px-4 py-2 rounded-lg flex items-center gap-2 shrink-0 transition";
+                    sec.classList.add('hidden');
+                }
+            });
+
+            // Re-initialize specific game states when switching
+            if (tabId === 'matching' && matchingState.round === 1 && matchingState.matchedCount === 0) {
+                initMatchingGame(1);
+            } else if (tabId === 'listening' && listeningState.currentIndex === 0) {
+                initListeningGame();
+            } else if (tabId === 'visual' && visualState.currentIndex === 0) {
+                initVisualGame();
+            }
+        }
+
+        function renderFlashcards() {
+            const container = document.getElementById('flashcards-grid');
+            container.innerHTML = '';
+
+            VOCAB_DATA.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition cursor-pointer group flex flex-col justify-between";
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-3xl">${item.icon}</span>
+                            <button onclick="event.stopPropagation(); speakKorean('${item.kr}')" class="w-8 h-8 rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-600 flex items-center justify-center transition">
+                                <i class="fas fa-volume-up text-sm"></i>
+                            </button>
+                        </div>
+                        <h3 class="text-xl font-black text-slate-800 tracking-wide">${item.kr}</h3>
+                        <p class="text-xs text-indigo-500 font-mono">[${item.roman}]</p>
+                    </div>
+                    <div class="mt-3 pt-2 border-t border-slate-100">
+                        <p class="text-sm font-bold text-slate-700">${item.vi}</p>
+                    </div>
+                `;
+                card.onclick = () => speakKorean(item.kr);
+                container.appendChild(card);
+            });
+        }
+
+        function playAllAudio() {
+            let index = 0;
+            function playNext() {
+                if (index < VOCAB_DATA.length) {
+                    speakKorean(VOCAB_DATA[index].kr);
+                    index++;
+                    setTimeout(playNext, 1800);
+                }
+            }
+            playNext();
+        }
+
+        let matchingState = {
+            round: 1,
+            selectedKr: null,
+            selectedVi: null,
+            matchedCount: 0,
+            roundData: []
+        };
+
+        function initMatchingGame(round = 1) {
+            matchingState.round = round;
+            matchingState.selectedKr = null;
+            matchingState.selectedVi = null;
+            matchingState.matchedCount = 0;
+
+            document.getElementById('matching-round-badge').textContent = `Lượt ${round} / 2`;
+            document.getElementById('matching-progress').textContent = `0/6`;
+            document.getElementById('matching-next-round-panel').classList.add('hidden');
+
+            // Split into 2 rounds of 6 items each
+            const sliceStart = (round - 1) * 6;
+            matchingState.roundData = VOCAB_DATA.slice(sliceStart, sliceStart + 6);
+
+            const leftItems = [...matchingState.roundData].sort(() => Math.random() - 0.5);
+            const rightItems = [...matchingState.roundData].sort(() => Math.random() - 0.5);
+
+            const leftCol = document.getElementById('matching-left');
+            const rightCol = document.getElementById('matching-right');
+
+            leftCol.innerHTML = '';
+            rightCol.innerHTML = '';
+
+            leftItems.forEach(item => {
+                const btn = document.createElement('button');
+                btn.id = `match-kr-${item.id}`;
+                btn.className = "w-full p-3.5 bg-slate-50 hover:bg-indigo-50 border-2 border-slate-200 rounded-xl font-bold text-slate-700 text-left transition flex justify-between items-center";
+                btn.innerHTML = `<span>${item.kr}</span> <i class="fas fa-volume-up text-xs opacity-0 group-hover:opacity-100 text-indigo-400"></i>`;
+                btn.onclick = () => selectMatchingLeft(item, btn);
+                leftCol.appendChild(btn);
+            });
+
+            rightItems.forEach(item => {
+                const btn = document.createElement('button');
+                btn.id = `match-vi-${item.id}`;
+                btn.className = "w-full p-3.5 bg-slate-50 hover:bg-indigo-50 border-2 border-slate-200 rounded-xl font-medium text-slate-700 text-left transition";
+                btn.textContent = item.vi;
+                btn.onclick = () => selectMatchingRight(item, btn);
+                rightCol.appendChild(btn);
+            });
+        }
+
+        function selectMatchingLeft(item, btnElement) {
+            speakKorean(item.kr);
+            if (btnElement.disabled) return;
+
+            // Clear previous selection highlight
+            document.querySelectorAll('#matching-left button').forEach(b => {
+                if (!b.disabled) b.className = "w-full p-3.5 bg-slate-50 hover:bg-indigo-50 border-2 border-slate-200 rounded-xl font-bold text-slate-700 text-left transition";
+            });
+
+            btnElement.className = "w-full p-3.5 bg-indigo-100 border-2 border-indigo-500 text-indigo-800 rounded-xl font-bold text-left transition shadow-sm";
+            matchingState.selectedKr = item;
+
+            checkMatchingPair();
+        }
+
+        function selectMatchingRight(item, btnElement) {
+            if (btnElement.disabled) return;
+
+            document.querySelectorAll('#matching-right button').forEach(b => {
+                if (!b.disabled) b.className = "w-full p-3.5 bg-slate-50 hover:bg-indigo-50 border-2 border-slate-200 rounded-xl font-medium text-slate-700 text-left transition";
+            });
+
+            btnElement.className = "w-full p-3.5 bg-indigo-100 border-2 border-indigo-500 text-indigo-800 rounded-xl font-medium text-left transition shadow-sm";
+            matchingState.selectedVi = item;
+
+            checkMatchingPair();
+        }
+
+        function checkMatchingPair() {
+            if (matchingState.selectedKr && matchingState.selectedVi) {
+                const krItem = matchingState.selectedKr;
+                const viItem = matchingState.selectedVi;
+
+                const krBtn = document.getElementById(`match-kr-${krItem.id}`);
+                const viBtn = document.getElementById(`match-vi-${viItem.id}`);
+
+                if (krItem.id === viItem.id) {
+                    // CORRECT MATCH
+                    krBtn.className = "w-full p-3.5 bg-emerald-100 border-2 border-emerald-500 text-emerald-800 rounded-xl font-bold text-left transition opacity-60";
+                    viBtn.className = "w-full p-3.5 bg-emerald-100 border-2 border-emerald-500 text-emerald-800 rounded-xl font-bold text-left transition opacity-60";
+                    krBtn.disabled = true;
+                    viBtn.disabled = true;
+
+                    matchingState.matchedCount++;
+                    document.getElementById('matching-progress').textContent = `${matchingState.matchedCount}/6`;
+                    updateScore(10);
+
+                    if (matchingState.matchedCount === 6) {
+                        if (matchingState.round === 1) {
+                            document.getElementById('matching-next-round-panel').classList.remove('hidden');
+                        } else {
+                            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+                            showResultModal("Bạn đã hoàn thành nối toàn bộ 12 từ vựng tiếng Hàn!");
+                        }
+                    }
+                } else {
+                    // WRONG MATCH
+                    krBtn.className = "w-full p-3.5 bg-rose-100 border-2 border-rose-500 text-rose-800 rounded-xl font-bold text-left transition";
+                    viBtn.className = "w-full p-3.5 bg-rose-100 border-2 border-rose-500 text-rose-800 rounded-xl font-bold text-left transition";
+
+                    setTimeout(() => {
+                        if (!krBtn.disabled) krBtn.className = "w-full p-3.5 bg-slate-50 hover:bg-indigo-50 border-2 border-slate-200 rounded-xl font-bold text-slate-700 text-left transition";
+                        if (!viBtn.disabled) viBtn.className = "w-full p-3.5 bg-slate-50 hover:bg-indigo-50 border-2 border-slate-200 rounded-xl font-medium text-slate-700 text-left transition";
+                    }, 800);
+                }
+
+                matchingState.selectedKr = null;
+                matchingState.selectedVi = null;
+            }
+        }
+
+        let listeningState = {
+            questions: [],
+            currentIndex: 0,
+            answered: false,
+            hasMistake: false
+        };
+
+        function initListeningGame() {
+            // Shuffle all 12 words to form 12 listening questions
+            listeningState.questions = [...VOCAB_DATA].sort(() => Math.random() - 0.5);
+            listeningState.currentIndex = 0;
+            renderListeningQuestion();
+        }
+
+        function renderListeningQuestion() {
+            listeningState.answered = false;
+            listeningState.hasMistake = false;
+            const current = listeningState.questions[listeningState.currentIndex];
+
+            document.getElementById('listening-step').textContent = `${listeningState.currentIndex + 1} / 12`;
+            document.getElementById('listening-feedback').classList.add('hidden');
+            document.getElementById('listening-next-btn').classList.add('hidden');
+
+            // Generate 4 multiple choice options
+            const distractors = VOCAB_DATA.filter(v => v.id !== current.id).sort(() => Math.random() - 0.5).slice(0, 3);
+            const options = [current, ...distractors].sort(() => Math.random() - 0.5);
+
+            const optionsContainer = document.getElementById('listening-options');
+            optionsContainer.innerHTML = '';
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "w-full p-4 bg-slate-50 hover:bg-indigo-50 border-2 border-slate-200 rounded-xl font-bold text-slate-800 text-center transition hover:border-indigo-400";
+                btn.innerHTML = `<span class="text-lg">${opt.kr}</span>`;
+                btn.onclick = () => checkListeningAnswer(opt, current, btn);
+                optionsContainer.appendChild(btn);
+            });
+
+            // Automatically play audio once loaded
+            setTimeout(() => playCurrentListeningAudio(), 300);
+        }
+
+        function playCurrentListeningAudio() {
+            const current = listeningState.questions[listeningState.currentIndex];
+            speakKorean(current.kr);
+        }
+
+        function checkListeningAnswer(selected, correct, btnElement) {
+            if (listeningState.answered) return;
+
+            const feedback = document.getElementById('listening-feedback');
+            feedback.classList.remove('hidden');
+
+            if (selected.id === correct.id) {
+                listeningState.answered = true;
+                // Disable all option buttons
+                document.querySelectorAll('#listening-options button').forEach(b => b.disabled = true);
+
+                btnElement.className = "w-full p-4 bg-emerald-100 border-2 border-emerald-500 text-emerald-900 rounded-xl font-bold text-center transition";
+                feedback.className = "p-4 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl font-bold text-sm text-center";
+                feedback.innerHTML = `<i class="fas fa-check-circle text-emerald-600 mr-1"></i> Chính xác! <strong>${correct.kr}</strong> [${correct.roman}] có nghĩa là: <em>${correct.vi}</em>`;
+                
+                if (!listeningState.hasMistake) {
+                    updateScore(10);
+                } else {
+                    updateScore(5);
+                }
+
+                document.getElementById('listening-next-btn').classList.remove('hidden');
+            } else {
+                listeningState.hasMistake = true;
+                btnElement.disabled = true;
+                btnElement.className = "w-full p-4 bg-rose-100 border-2 border-rose-300 text-rose-500 rounded-xl font-bold text-center transition line-through opacity-60 cursor-not-allowed";
+                feedback.className = "p-4 bg-rose-50 text-rose-800 border border-rose-200 rounded-xl font-bold text-sm text-center";
+                feedback.innerHTML = `<i class="fas fa-times-circle text-rose-600 mr-1"></i> Chưa đúng! Bạn hãy nghe lại và thử chọn lại đáp án khác.`;
+            }
+        }
+
+        function nextListeningQuestion() {
+            if (listeningState.currentIndex < listeningState.questions.length - 1) {
+                listeningState.currentIndex++;
+                renderListeningQuestion();
+            } else {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+                showResultModal("Bạn đã hoàn thành tất cả 12 câu luyện nghe!");
+            }
+        }
+
+        let visualState = {
+            questions: [],
+            currentIndex: 0,
+            answered: false,
+            hasMistake: false
+        };
+
+        function initVisualGame() {
+            // Shuffle all 12 words for visual quiz
+            visualState.questions = [...VOCAB_DATA].sort(() => Math.random() - 0.5);
+            visualState.currentIndex = 0;
+            renderVisualQuestion();
+        }
+
+        function renderVisualQuestion() {
+            visualState.answered = false;
+            visualState.hasMistake = false;
+            const current = visualState.questions[visualState.currentIndex];
+
+            document.getElementById('visual-step').textContent = `${visualState.currentIndex + 1} / 12`;
+            document.getElementById('visual-icon').textContent = current.icon;
+            document.getElementById('visual-desc').textContent = `"${current.desc}"`;
+            document.getElementById('visual-feedback').classList.add('hidden');
+            document.getElementById('visual-next-btn').classList.add('hidden');
+
+            const distractors = VOCAB_DATA.filter(v => v.id !== current.id).sort(() => Math.random() - 0.5).slice(0, 3);
+            const options = [current, ...distractors].sort(() => Math.random() - 0.5);
+
+            const optionsContainer = document.getElementById('visual-options');
+            optionsContainer.innerHTML = '';
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "w-full p-4 bg-slate-50 hover:bg-indigo-50 border-2 border-slate-200 rounded-xl font-bold text-slate-800 text-center transition hover:border-indigo-400";
+                btn.innerHTML = `<span class="text-lg">${opt.kr}</span>`;
+                btn.onclick = () => checkVisualAnswer(opt, current, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkVisualAnswer(selected, correct, btnElement) {
+            if (visualState.answered) return;
+
+            const feedback = document.getElementById('visual-feedback');
+            feedback.classList.remove('hidden');
+
+            if (selected.id === correct.id) {
+                visualState.answered = true;
+                document.querySelectorAll('#visual-options button').forEach(b => b.disabled = true);
+
+                speakKorean(correct.kr);
+
+                btnElement.className = "w-full p-4 bg-emerald-100 border-2 border-emerald-500 text-emerald-900 rounded-xl font-bold text-center transition";
+                feedback.className = "p-4 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl font-bold text-sm text-center";
+                feedback.innerHTML = `<i class="fas fa-check-circle text-emerald-600 mr-1"></i> Đúng rồi! <strong>${correct.kr}</strong> [${correct.roman}] là <em>${correct.vi}</em>.`;
+                
+                if (!visualState.hasMistake) {
+                    updateScore(10);
+                } else {
+                    updateScore(5);
+                }
+
+                document.getElementById('visual-next-btn').classList.remove('hidden');
+            } else {
+                visualState.hasMistake = true;
+                btnElement.disabled = true;
+                btnElement.className = "w-full p-4 bg-rose-100 border-2 border-rose-300 text-rose-500 rounded-xl font-bold text-center transition line-through opacity-60 cursor-not-allowed";
+                feedback.className = "p-4 bg-rose-50 text-rose-800 border border-rose-200 rounded-xl font-bold text-sm text-center";
+                feedback.innerHTML = `<i class="fas fa-times-circle text-rose-600 mr-1"></i> Chưa đúng rồi! Hãy thử chọn lại đáp án khác.`;
+            }
+        }
+
+        function nextVisualQuestion() {
+            if (visualState.currentIndex < visualState.questions.length - 1) {
+                visualState.currentIndex++;
+                renderVisualQuestion();
+            } else {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+                showResultModal("Bạn đã xuất sắc hoàn thành bài tập hình ảnh!");
+            }
+        }
+
+        function showResultModal(msg) {
+            document.getElementById('result-message').textContent = msg;
+            document.getElementById('modal-score').textContent = score;
+            document.getElementById('modal-accuracy').textContent = "100%";
+            document.getElementById('result-modal').classList.remove('hidden');
+        }
+
+        function closeResultModal() {
+            document.getElementById('result-modal').classList.add('hidden');
+            switchTab('study');
+        }
+
+        // Initialize App on load
+        window.onload = function() {
+            renderFlashcards();
+            initMatchingGame(1);
+            initListeningGame();
+            initVisualGame();
+        };
+    </script>
+</body>
+</html>
