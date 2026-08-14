@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Study Korean Dashboard</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      display: flex;
+      height: 100vh;
+      background-color: #f8fafc;
+      overflow: hidden;
+    }
+
+    /* --- SIDEBAR TRÁI --- */
+    .sidebar {
+      width: 280px;
+      background: #ffffff;
+      border-right: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      padding: 24px 16px;
+      gap: 8px;
+    }
+
+    .sidebar-header {
+      padding: 0 12px 16px 12px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #0f172a;
+      border-bottom: 1px solid #f1f5f9;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Menu item chính */
+    .menu-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .menu-tab {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #334155;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: left;
+    }
+
+    .menu-tab:hover {
+      background-color: #f1f5f9;
+      color: #0f172a;
+    }
+
+    .menu-tab.active {
+      background-color: #16a34a; /* Màu xanh lá chuẩn mẫu */
+      color: #ffffff;
+    }
+
+    .tab-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .tab-icon {
+      font-size: 1.15rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .arrow {
+      font-size: 0.75rem;
+      transition: transform 0.2s ease;
+    }
+
+    .menu-tab.open .arrow {
+      transform: rotate(90deg);
+    }
+
+    /* Menu con (Submenu) */
+    .submenu {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding-left: 36px;
+      margin-top: 4px;
+      margin-bottom: 8px;
+    }
+
+    .submenu a {
+      display: block;
+      padding: 9px 14px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: #64748b;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .submenu a:hover {
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+
+    .submenu a.selected {
+      background-color: #e0f2fe;
+      color: #0284c7;
+      font-weight: 600;
+    }
+
+    /* --- KHUNG HIỂN THỊ NỘI DUNG PHẢI --- */
+    .content-area {
+      flex: 1;
+      height: 100%;
+      background: #ffffff;
+    }
+
+    .content-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      📚 Study Korean
+    </div>
+
+    <div class="menu-group">
+      <!-- Tab Vocab Trường học -->
+      <button class="menu-tab active open" id="vocabToggle" onclick="toggleSubmenu()">
+        <div class="tab-title">
+          <span class="tab-icon">🏫</span>
+          <span>Vocab Trường học</span>
+        </div>
+        <span class="arrow">▶</span>
+      </button>
+
+      <!-- Danh sách bài học con -->
+      <div class="submenu" id="vocabSubmenu">
+        <a href="./vocab2.1/" target="lesson-frame" class="selected" onclick="setActiveLink(this)">
+          • Vocab 2.1
+        </a>
+        <a href="./vocab2.2/" target="lesson-frame" onclick="setActiveLink(this)">
+          • Vocab 2.2
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Khung iframe hiển thị bài học -->
+  <main class="content-area">
+    <iframe name="lesson-frame" id="mainFrame" class="content-frame" src="./vocab2.1/"></iframe>
+  </main>
+
+  <script>
+    // Hàm bật/tắt đóng mở danh mục con
+    function toggleSubmenu() {
+      const submenu = document.getElementById('vocabSubmenu');
+      const toggleBtn = document.getElementById('vocabToggle');
+      if (submenu.style.display === 'none') {
+        submenu.style.display = 'flex';
+        toggleBtn.classList.add('open');
+      } else {
+        submenu.style.display = 'none';
+        toggleBtn.classList.remove('open');
+      }
+    }
+
+    // Đổi trạng thái active khi click vào link con
+    function setActiveLink(element) {
+      const links = document.querySelectorAll('.submenu a');
+      links.forEach(link => link.classList.remove('selected'));
+      element.classList.add('selected');
+    }
+  </script>
+
+</body>
+</html>
