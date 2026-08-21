@@ -35,6 +35,7 @@
       gap: 12px;
       z-index: 10;
       box-shadow: 2px 0 8px rgba(0, 0, 0, 0.02);
+      overflow-y: auto;
     }
 
     .sidebar-header {
@@ -101,8 +102,8 @@
       transition: transform 0.2s ease;
     }
 
-    .menu-tab.open .arrow {
-      transform: rotate(180deg);
+    .menu-tab.collapsed .arrow {
+      transform: rotate(-90deg);
     }
 
     /* Submenu danh sách bài con */
@@ -112,6 +113,11 @@
       gap: 2px;
       padding-left: 20px;
       margin-top: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .submenu.hidden {
+      display: none !important;
     }
 
     .submenu a {
@@ -163,7 +169,7 @@
 
     <!-- Nhóm 1: Vocab Trường học -->
     <div class="menu-group">
-      <button class="menu-tab active open" id="toggleSchool" onclick="toggleSubmenu('submenuSchool', 'toggleSchool')">
+      <button class="menu-tab active" id="toggleSchool" onclick="toggleSubmenu('submenuSchool', 'toggleSchool')">
         <div class="tab-title">
           <span class="tab-icon">🏫</span>
           <span>Vocab Trường học</span>
@@ -173,7 +179,7 @@
 
       <!-- Submenu Trường học -->
       <div class="submenu" id="submenuSchool">
-        <a href="./vocab2.1/" target="lesson-frame" class="selected" onclick="setActiveLink(this)">
+        <a href="./vocab2.1/" target="lesson-frame" onclick="setActiveLink(this)">
           • Vocab 2.1
         </a>
         <a href="./vocab2.2/" target="lesson-frame" onclick="setActiveLink(this)">
@@ -184,7 +190,7 @@
 
     <!-- Nhóm 2: Vocab Ngày & Số -->
     <div class="menu-group">
-      <button class="menu-tab open" id="toggleDate" onclick="toggleSubmenu('submenuDate', 'toggleDate')">
+      <button class="menu-tab active" id="toggleDate" onclick="toggleSubmenu('submenuDate', 'toggleDate')">
         <div class="tab-title">
           <span class="tab-icon">🗓️</span>
           <span>Vocab Ngày & Số</span>
@@ -194,7 +200,7 @@
 
       <!-- Submenu Ngày & Số -->
       <div class="submenu" id="submenuDate">
-        <a href="./vocab4.1/" target="lesson-frame" onclick="setActiveLink(this)">
+        <a href="./vocab4.1/" target="lesson-frame" class="selected" onclick="setActiveLink(this)">
           • Vocab 4.1: Ngày & Thời gian
         </a>
         <a href="./vocab4.2/" target="lesson-frame" onclick="setActiveLink(this)">
@@ -206,19 +212,17 @@
 
   <!-- Khung iframe hiển thị bài học tràn viền -->
   <main class="content-area">
-    <iframe name="lesson-frame" id="mainFrame" class="content-frame" src="./vocab2.1/"></iframe>
+    <iframe name="lesson-frame" id="mainFrame" class="content-frame" src="./vocab4.1/"></iframe>
   </main>
 
   <script>
     function toggleSubmenu(submenuId, toggleBtnId) {
       const submenu = document.getElementById(submenuId);
       const toggleBtn = document.getElementById(toggleBtnId);
-      if (submenu.style.display === 'none') {
-        submenu.style.display = 'flex';
-        toggleBtn.classList.add('open');
-      } else {
-        submenu.style.display = 'none';
-        toggleBtn.classList.remove('open');
+      
+      if (submenu && toggleBtn) {
+        submenu.classList.toggle('hidden');
+        toggleBtn.classList.toggle('collapsed');
       }
     }
 
