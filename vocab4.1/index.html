@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocab 4.1 - Ngày, Tháng & Thời Gian</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <!-- Header Navbar -->
+    <header class="bg-indigo-600 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <span class="text-2xl">📅</span>
+                <div>
+                    <h1 class="font-extrabold text-base md:text-lg leading-tight">Vocab 4.1: Ngày, Tháng & Thời Gian</h1>
+                    <p class="text-xs text-indigo-200">Tổng cộng 39 từ vựng cơ bản</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2 bg-indigo-700/80 px-3 py-1.5 rounded-xl border border-indigo-500/40 text-sm">
+                <i class="fas fa-trophy text-amber-300"></i>
+                <span>Điểm: <strong id="total-score" class="text-amber-300 font-bold">0</strong></span>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="max-w-5xl mx-auto px-4 flex overflow-x-auto gap-2 py-2 border-t border-indigo-500/30 no-scrollbar text-sm">
+            <button onclick="switchTab('study')" id="tab-study" class="tab-btn active-tab bg-white text-indigo-700 font-bold px-4 py-2 rounded-lg flex items-center gap-2 shrink-0 shadow-sm transition">
+                <i class="fas fa-book-open"></i> 1. Ôn Từ Vựng
+            </button>
+            <button onclick="switchTab('matching')" id="tab-matching" class="tab-btn bg-indigo-700/50 hover:bg-indigo-700 text-indigo-100 font-semibold px-4 py-2 rounded-lg flex items-center gap-2 shrink-0 transition">
+                <i class="fas fa-project-diagram"></i> 2. Nối Từ
+            </button>
+            <button onclick="switchTab('listening')" id="tab-listening" class="tab-btn bg-indigo-700/50 hover:bg-indigo-700 text-indigo-100 font-semibold px-4 py-2 rounded-lg flex items-center gap-2 shrink-0 transition">
+                <i class="fas fa-volume-up"></i> 3. Luyện Nghe
+            </button>
+            <button onclick="switchTab('visual')" id="tab-visual" class="tab-btn bg-indigo-700/50 hover:bg-indigo-700 text-indigo-100 font-semibold px-4 py-2 rounded-lg flex items-center gap-2 shrink-0 transition">
+                <i class="fas fa-images"></i> 4. Trắc Nghiệm Mô Tả
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-5xl mx-auto px-4 py-6 w-full flex-grow">
+
+        <!-- TAB 1: STUDY FLASHCARDS -->
+        <section id="sec-study" class="space-y-6">
+            <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-lg font-bold text-indigo-900 flex items-center gap-2">
+                        <i class="fas fa-graduation-cap text-indigo-600"></i> Danh Sách Từ Vựng Học (39 từ)
+                    </h2>
+                    <p class="text-xs text-indigo-700 mt-1">Bấm vào nút loa hoặc bấm vào thẻ để nghe phát âm giọng chuẩn Hangul.</p>
+                </div>
+                <button onclick="playAllAudio()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl shadow transition flex items-center gap-2 text-xs shrink-0">
+                    <i class="fas fa-play-circle"></i> Nghe lần lượt tất cả
+                </button>
+            </div>
+
+            <!-- Flashcards Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4" id="flashcards-grid"></div>
+        </section>
+
+        <!-- TAB 2: MATCHING GAME -->
+        <section id="sec-matching" class="hidden space-y-6">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div>
+                    <span id="matching-round-badge" class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-bold uppercase tracking-wider">Lượt 1</span>
+                    <h2 class="text-lg font-bold text-slate-800 mt-1">Nối Từ Tiếng Hàn Với Nghĩa Tiếng Việt</h2>
+                    <p class="text-xs text-slate-500">Bấm chọn từ bên trái, sau đó chọn nghĩa tương ứng ở bên phải.</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-sm font-medium text-slate-600">Đã nối: <strong id="matching-progress" class="text-indigo-600">0/0</strong></span>
+                    <button onclick="initMatchingGame(matchingState.round)" class="px-3 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg transition">
+                        <i class="fas fa-redo"></i> Chơi lại lượt này
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 min-h-[380px]">
+                <div class="space-y-3">
+                    <h3 class="font-bold text-slate-600 text-center pb-2 border-b border-slate-100">Tiếng Hàn (한국어)</h3>
+                    <div id="matching-left" class="space-y-3"></div>
+                </div>
+                <div class="space-y-3">
+                    <h3 class="font-bold text-slate-600 text-center pb-2 border-b border-slate-100">Tiếng Việt</h3>
+                    <div id="matching-right" class="space-y-3"></div>
+                </div>
+            </div>
+
+            <div id="matching-next-round-panel" class="hidden bg-emerald-50 border border-emerald-200 p-6 rounded-2xl text-center space-y-3">
+                <div class="text-emerald-600 text-4xl"><i class="fas fa-check-circle"></i></div>
+                <h3 class="text-lg font-bold text-emerald-900" id="matching-round-title">Hoàn thành xuất sắc lượt này!</h3>
+                <p class="text-emerald-700 text-sm" id="matching-round-desc">Hãy tiếp tục lượt tiếp theo để ôn hết toàn bộ từ vựng.</p>
+                <button id="matching-next-round-btn" onclick="nextMatchingRound()" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md transition inline-flex items-center gap-2 text-sm">
+                    Sang Lượt Tiếp Theo <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- TAB 3: LISTENING EXERCISE -->
+        <section id="sec-listening" class="hidden space-y-6">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex justify-between items-center">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">Nghe Phát Âm Chọn Từ Vựng Đúng</h2>
+                    <p class="text-xs text-slate-500">Giọng chuẩn Hangul. Bạn có thể chọn lại nếu chọn chưa đúng.</p>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs font-semibold text-slate-400 block">Tiến độ</span>
+                    <span id="listening-step" class="text-base font-bold text-indigo-600">1 / 10</span>
+                </div>
+            </div>
+
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 text-center space-y-6 max-w-2xl mx-auto">
+                <div class="space-y-3">
+                    <button id="listen-audio-btn" onclick="playCurrentListeningAudio()" class="w-20 h-20 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg hover:scale-105 active:scale-95 transition flex items-center justify-center mx-auto text-2xl group">
+                        <i class="fas fa-volume-up group-hover:animate-pulse"></i>
+                    </button>
+                    <p class="text-xs font-semibold text-indigo-700">Bấm nút loa để nghe từ vựng</p>
+                </div>
+
+                <div id="listening-options" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left"></div>
+                <div id="listening-feedback" class="hidden p-4 rounded-xl text-center font-bold text-xs"></div>
+
+                <div class="pt-2 flex justify-end">
+                    <button id="listening-next-btn" onclick="nextListeningQuestion()" class="hidden px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition text-sm">
+                        Câu tiếp theo <i class="fas fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: VISUAL / DESCRIPTION QUIZ -->
+        <section id="sec-visual" class="hidden space-y-6">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex justify-between items-center">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">Trắc Nghiệm Mô Tả Khái Niệm</h2>
+                    <p class="text-xs text-slate-500">Đọc mô tả/biểu tượng và chọn từ tiếng Hàn phù hợp.</p>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs font-semibold text-slate-400 block">Tiến độ</span>
+                    <span id="visual-step" class="text-base font-bold text-indigo-600">1 / 10</span>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 max-w-2xl mx-auto space-y-6">
+                <div id="visual-display" class="bg-gradient-to-br from-indigo-500 to-purple-600 text-white p-6 rounded-2xl text-center space-y-2 shadow-inner">
+                    <div id="visual-icon" class="text-5xl">📅</div>
+                    <p id="visual-desc" class="text-sm font-medium opacity-90">Mô tả khái niệm</p>
+                </div>
+
+                <div id="visual-options" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+                <div id="visual-feedback" class="hidden p-4 rounded-xl text-center font-bold text-xs"></div>
+
+                <div class="pt-2 flex justify-end">
+                    <button id="visual-next-btn" onclick="nextVisualQuestion()" class="hidden px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition text-sm">
+                        Câu tiếp theo <i class="fas fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- RESULT MODAL -->
+        <div id="result-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-3xl max-w-md w-full p-6 text-center space-y-5 shadow-2xl">
+                <div class="w-16 h-16 bg-amber-100 text-amber-500 text-3xl rounded-full flex items-center justify-center mx-auto">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-black text-slate-800">Hoàn Thành Xuất Sắc!</h3>
+                    <p class="text-slate-500 text-xs mt-1" id="result-message">Bạn đã hoàn thành bài tập ôn luyện này!</p>
+                </div>
+
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 grid grid-cols-2 gap-3 text-center">
+                    <div>
+                        <span class="text-xs text-slate-400 block">Tổng Điểm</span>
+                        <span id="modal-score" class="text-2xl font-black text-indigo-600">0</span>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-400 block">Trạng Thái</span>
+                        <span class="text-lg font-bold text-emerald-600">Hoàn thành</span>
+                    </div>
+                </div>
+
+                <button onclick="closeResultModal()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow transition text-sm">
+                    Tiếp Tục Ôn Tập
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- JavaScript Data and Logic -->
+    <script>
+        const VOCAB_DATA = [
+            // Days of the week (7)
+            { id: 101, kr: "월요일", vi: "Thứ hai", roman: "wol-yo-il", icon: "🌙", desc: "Ngày đầu tiên trong tuần làm việc", speak: "월요일" },
+            { id: 102, kr: "화요일", vi: "Thứ ba", roman: "hwa-yo-il", icon: "🔥", desc: "Ngày thứ hai trong tuần", speak: "화요일" },
+            { id: 103, kr: "수요일", vi: "Thứ tư", roman: "su-yo-il", icon: "💧", desc: "Ngày giữa tuần làm việc", speak: "수요일" },
+            { id: 104, kr: "목요일", vi: "Thứ năm", roman: "mong-nyo-il", icon: "🌲", desc: "Ngày áp chót của tuần làm việc", speak: "목요일" },
+            { id: 105, kr: "금요일", vi: "Thứ sáu", roman: "geum-yo-il", icon: "🪙", desc: "Ngày làm việc cuối cùng trong tuần", speak: "금요일" },
+            { id: 106, kr: "토요일", vi: "Thứ bảy", roman: "to-yo-il", icon: "⛰️", desc: "Ngày bắt đầu kỳ nghỉ cuối tuần", speak: "토요일" },
+            { id: 107, kr: "일요일", vi: "Chủ nhật", roman: "ir-yo-il", icon: "☀️", desc: "Ngày chủ nhật nghỉ ngơi", speak: "일요일" },
+
+            // Time & Relative time terms (20)
+            { id: 201, kr: "그저께", vi: "Hôm kia", roman: "geu-jeo-kke", icon: "⏳", desc: "Ngày trước ngày hôm qua", speak: "그저께" },
+            { id: 202, kr: "어제", vi: "Hôm qua", roman: "eo-je", icon: "⏪", desc: "Ngày ngay trước ngày hôm nay", speak: "어제" },
+            { id: 203, kr: "오늘", vi: "Hôm nay", roman: "o-neul", icon: "📍", desc: "Ngày hiện tại", speak: "오늘" },
+            { id: 204, kr: "내일", vi: "Ngày mai", roman: "nae-il", icon: "⏩", desc: "Ngày ngay sau ngày hôm nay", speak: "내일" },
+            { id: 205, kr: "모레", vi: "Ngày kia", roman: "mo-re", icon: "🔮", desc: "Ngày sau ngày mai", speak: "모레" },
+            { id: 206, kr: "년", vi: "Năm", roman: "nyeon", icon: "🗓️", desc: "Đơn vị thời gian tính theo năm", speak: "년" },
+            { id: 207, kr: "월", vi: "Tháng", roman: "wol", icon: "🌙", desc: "Đơn vị thời gian tính theo tháng", speak: "월" },
+            { id: 208, kr: "일", vi: "Ngày", roman: "il", icon: "📆", desc: "Đơn vị thời gian tính theo ngày", speak: "일" },
+            { id: 209, kr: "시", vi: "Giờ", roman: "si", icon: "⏰", desc: "Đơn vị thời gian chỉ giờ giấc", speak: "시" },
+            { id: 210, kr: "지난주", vi: "Tuần trước", roman: "ji-nan-ju", icon: "⬅️", desc: "Tuần đã trôi qua", speak: "지난주" },
+            { id: 211, kr: "이번 주", vi: "Tuần này", roman: "i-beon ju", icon: "⏬", desc: "Tuần hiện tại", speak: "이번 주" },
+            { id: 212, kr: "다음 주", vi: "Tuần sau", roman: "da-eum ju", icon: "➡️", desc: "Tuần sắp tới", speak: "다음 주" },
+            { id: 213, kr: "지난달", vi: "Tháng trước", roman: "ji-nan-dal", icon: "⬅️", desc: "Tháng vừa qua", speak: "지난달" },
+            { id: 214, kr: "이번 달", vi: "Tháng này", roman: "i-beon dal", icon: "⏬", desc: "Tháng hiện tại", speak: "이번 달" },
+            { id: 215, kr: "다음 달", vi: "Tháng sau", roman: "da-eum dal", icon: "➡️", desc: "Tháng sắp tới", speak: "다음 달" },
+            { id: 216, kr: "작년", vi: "Năm ngoái", roman: "jang-nyeon", icon: "⬅️", desc: "Năm vừa qua (지난해)", speak: "작년" },
+            { id: 217, kr: "올해", vi: "Năm nay", roman: "ol-hae", icon: "⏬", desc: "Năm hiện tại (금년)", speak: "올해" },
+            { id: 218, kr: "내년", vi: "Năm sau", roman: "nae-nyeon", icon: "➡️", desc: "Năm tiếp theo (다음 해)", speak: "내년" },
+            { id: 219, kr: "평일", vi: "Ngày thường", roman: "pyeong-il", icon: "💼", desc: "Các ngày từ thứ 2 đến thứ 6 (주중)", speak: "평일" },
+            { id: 220, kr: "주말", vi: "Cuối tuần", roman: "ju-mal", icon: "🎈", desc: "Thứ 7 và chủ nhật", speak: "주말" },
+
+            // 12 Months (12)
+            { id: 301, kr: "1월", vi: "Tháng 1", roman: "ir-wol", icon: "❄️", desc: "Tháng 1 trong năm (일월)", speak: "일월" },
+            { id: 302, kr: "2월", vi: "Tháng 2", roman: "i-wol", icon: "🧧", desc: "Tháng 2 trong năm (이월)", speak: "이월" },
+            { id: 303, kr: "3월", vi: "Tháng 3", roman: "sam-wol", icon: "🌱", desc: "Tháng 3 trong năm (삼월)", speak: "삼월" },
+            { id: 304, kr: "4월", vi: "Tháng 4", roman: "sa-wol", icon: "🌸", desc: "Tháng 4 trong năm (사월)", speak: "사월" },
+            { id: 305, kr: "5월", vi: "Tháng 5", roman: "o-wol", icon: "🌿", desc: "Tháng 5 trong năm (오월)", speak: "오월" },
+            { id: 306, kr: "6월", vi: "Tháng 6", roman: "yu-wol", icon: "☀️", desc: "Tháng 6 trong năm (유월 - biến âm)", speak: "유월" },
+            { id: 307, kr: "7월", vi: "Tháng 7", roman: "chir-wol", icon: "🏖️", desc: "Tháng 7 trong năm (칠월)", speak: "칠월" },
+            { id: 308, kr: "8월", vi: "Tháng 8", roman: "par-wol", icon: "🍉", desc: "Tháng 8 trong năm (팔월)", speak: "팔월" },
+            { id: 309, kr: "9월", vi: "Tháng 9", roman: "gu-wol", icon: "🍂", desc: "Tháng 9 trong năm (구월)", speak: "구월" },
+            { id: 310, kr: "10월", vi: "Tháng 10", roman: "si-wol", icon: "🍁", desc: "Tháng 10 trong năm (시월 - biến âm)", speak: "시월" },
+            { id: 311, kr: "11월", vi: "Tháng 11", roman: "si-bir-wol", icon: "🌾", desc: "Tháng 11 trong năm (십일월)", speak: "십일월" },
+            { id: 312, kr: "12월", vi: "Tháng 12", roman: "si-bi-wol", icon: "🎄", desc: "Tháng 12 trong năm (십이월)", speak: "십이월" }
+        ];
+
+        let score = 0;
+        const synth = window.speechSynthesis;
+        let koreanVoice = null;
+
+        function loadVoices() {
+            if (!synth) return;
+            const voices = synth.getVoices();
+            koreanVoice = voices.find(v => v.lang.includes('ko') || v.lang.includes('KO')) || null;
+        }
+        if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadVoices;
+        loadVoices();
+
+        function speakKorean(text) {
+            if (!synth) return;
+            synth.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ko-KR';
+            utterance.rate = 0.85;
+            if (koreanVoice) utterance.voice = koreanVoice;
+            synth.speak(utterance);
+        }
+
+        function updateScore(pts) {
+            score += pts;
+            document.getElementById('total-score').textContent = score;
+        }
+
+        function switchTab(tabId) {
+            ['study', 'matching', 'listening', 'visual'].forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                const sec = document.getElementById(`sec-${t}`);
+                if (t === tabId) {
+                    btn.className = "tab-btn active-tab bg-white text-indigo-700 font-bold px-4 py-2 rounded-lg flex items-center gap-2 shrink-0 shadow-sm transition";
+                    sec.classList.remove('hidden');
+                } else {
+                    btn.className = "tab-btn bg-indigo-700/50 hover:bg-indigo-700 text-indigo-100 font-semibold px-4 py-2 rounded-lg flex items-center gap-2 shrink-0 transition";
+                    sec.classList.add('hidden');
+                }
+            });
+
+            if (tabId === 'matching') initMatchingGame(1);
+            if (tabId === 'listening') initListeningGame();
+            if (tabId === 'visual') initVisualGame();
+        }
+
+        function renderFlashcards() {
+            const container = document.getElementById('flashcards-grid');
+            container.innerHTML = '';
+            VOCAB_DATA.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between";
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-3xl">${item.icon}</span>
+                            <button onclick="event.stopPropagation(); speakKorean('${item.speak}')" class="w-8 h-8 rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-600 flex items-center justify-center transition">
+                                <i class="fas fa-volume-up text-xs"></i>
+                            </button>
+                        </div>
+                        <h3 class="text-xl font-black text-slate-800">${item.kr}</h3>
+                        <p class="text-xs text-indigo-500 font-mono">[${item.roman}]</p>
+                    </div>
+                    <div class="mt-3 pt-2 border-t border-slate-100">
+                        <p class="text-xs font-bold text-slate-700">${item.vi}</p>
+                    </div>
+                `;
+                card.onclick = () => speakKorean(item.speak);
+                container.appendChild(card);
+            });
+        }
+
+        let matchingState = { round: 1, selectedKr: null, selectedVi: null, matchedCount: 0, roundData: [], targetCount: 6, totalRounds: 1 };
+
+        function initMatchingGame(round = 1) {
+            matchingState.round = round;
+            matchingState.selectedKr = null;
+            matchingState.selectedVi = null;
+            matchingState.matchedCount = 0;
+
+            const itemsPerRound = 6;
+            matchingState.totalRounds = Math.ceil(VOCAB_DATA.length / itemsPerRound) || 1;
+            const sliceStart = (round - 1) * itemsPerRound;
+            matchingState.roundData = VOCAB_DATA.slice(sliceStart, Math.min(sliceStart + itemsPerRound, VOCAB_DATA.length));
+            matchingState.targetCount = matchingState.roundData.length;
+
+            document.getElementById('matching-round-badge').textContent = `Lượt ${round} / ${matchingState.totalRounds}`;
+            document.getElementById('matching-progress').textContent = `0/${matchingState.targetCount}`;
+            document.getElementById('matching-next-round-panel').classList.add('hidden');
+
+            const leftItems = [...matchingState.roundData].sort(() => Math.random() - 0.5);
+            const rightItems = [...matchingState.roundData].sort(() => Math.random() - 0.5);
+
+            const leftCol = document.getElementById('matching-left');
+            const rightCol = document.getElementById('matching-right');
+            leftCol.innerHTML = '';
+            rightCol.innerHTML = '';
+
+            leftItems.forEach(item => {
+                const btn = document.createElement('button');
+                btn.id = `match-kr-${item.id}`;
+                btn.className = "w-full p-3 bg-slate-50 hover:bg-indigo-50 border-2 border-slate-200 rounded-xl font-bold text-slate-700 text-left transition flex justify-between items-center text-sm";
+                btn.innerHTML = `<span>${item.kr}</span>`;
+                btn.onclick = () => selectMatchingLeft(item, btn);
+                leftCol.appendChild(btn);
+            });
+
+            rightItems.forEach(item => {
+                const btn = document.createElement('button');
+                btn.id = `match-vi-${item.id}`;
+                btn.className = "w-full p-3 bg-slate-50 hover:bg-indigo-50 border-2 border-slate-200 rounded-xl font-medium text-slate-700 text-left transition text-sm";
+                btn.textContent = item.vi;
+                btn.onclick = () => selectMatchingRight(item, btn);
+                rightCol.appendChild(btn);
+            });
+        }
+
+        function selectMatchingLeft(item, btnElement) {
+            speakKorean(item.speak);
+            if (btnElement.disabled) return;
+            document.querySelectorAll('#matching-left button').forEach(b => {
+                if (!b.disabled) b.className = "w-full p-3 bg-slate-50 hover:bg-indigo-50 border-2 border-slate-200 rounded-xl font-bold text-slate-700 text-left transition text-sm";
+            });
+            btnElement.className = "w-full p-3 bg-indigo-100 border-2 border-indigo-500 text-indigo-800 rounded-xl font-bold text-left transition shadow-sm text-sm";
+            matchingState.selectedKr = item;
+            checkMatchingPair();
+        }
+
+        function selectMatchingRight(item, btnElement) {
+            if (btnElement.disabled) return;
+            document.querySelectorAll('#matching-right button').forEach(b => {
+                if (!b.disabled) b.className = "w-full p-3 bg-slate-50 hover:bg-indigo-50 border-2 border-slate-200 rounded-xl font-medium text-slate-700 text-left transition text-sm";
+            });
+            btnElement.className = "w-full p-3 bg-indigo-100 border-2 border-indigo-500 text-indigo-800 rounded-xl font-medium text-left transition shadow-sm text-sm";
+            matchingState.selectedVi = item;
+            checkMatchingPair();
+        }
+
+        function checkMatchingPair() {
+            if (matchingState.selectedKr && matchingState.selectedVi) {
+                const krItem = matchingState.selectedKr;
+                const viItem = matchingState.selectedVi;
+                const krBtn = document.getElementById(`match-kr-${krItem.id}`);
+                const viBtn = document.getElementById(`match-vi-${viItem.id}`);
+
+                if (krItem.id === viItem.id) {
+                    krBtn.className = "w-full p-3 bg-emerald-100 border-2 border-emerald-500 text-emerald-800 rounded-xl font-bold text-left transition opacity-60 text-sm";
+                    viBtn.className = "w-full p-3 bg-emerald-100 border-2 border-emerald-500 text-emerald-800 rounded-xl font-bold text-left transition opacity-60 text-sm";
+                    krBtn.disabled = true;
+                    viBtn.disabled = true;
+
+                    matchingState.matchedCount++;
+                    document.getElementById('matching-progress').textContent = `${matchingState.matchedCount}/${matchingState.targetCount}`;
+                    updateScore(10);
+
+                    if (matchingState.matchedCount === matchingState.targetCount) {
+                        document.getElementById('matching-next-round-panel').classList.remove('hidden');
+                        if (matchingState.round < matchingState.totalRounds) {
+                            document.getElementById('matching-round-title').textContent = `Xuất sắc! Bạn đã xong lượt ${matchingState.round}!`;
+                            document.getElementById('matching-next-round-btn').innerHTML = `Sang Lượt ${matchingState.round + 1} <i class="fas fa-arrow-right"></i>`;
+                        } else {
+                            document.getElementById('matching-round-title').textContent = `Chúc mừng! Bạn đã ôn hết từ vựng 4.1!`;
+                            document.getElementById('matching-next-round-btn').innerHTML = `Chơi lại lượt 1 <i class="fas fa-redo"></i>`;
+                            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+                        }
+                    }
+                } else {
+                    krBtn.className = "w-full p-3 bg-rose-100 border-2 border-rose-500 text-rose-800 rounded-xl font-bold text-left transition text-sm";
+                    viBtn.className = "w-full p-3 bg-rose-100 border-2 border-rose-500 text-rose-800 rounded-xl font-bold text-left transition text-sm";
+                    setTimeout(() => {
+                        if (!krBtn.disabled) krBtn.className = "w-full p-3 bg-slate-50 hover:bg-indigo-50 border-2 border-slate-200 rounded-xl font-bold text-slate-700 text-left transition text-sm";
+                        if (!viBtn.disabled) viBtn.className = "w-full p-3 bg-slate-50 hover:bg-indigo-50 border-2 border-slate-200 rounded-xl font-medium text-slate-700 text-left transition text-sm";
+                    }, 800);
+                }
+                matchingState.selectedKr = null;
+                matchingState.selectedVi = null;
+            }
+        }
+
+        function nextMatchingRound() {
+            if (matchingState.round < matchingState.totalRounds) initMatchingGame(matchingState.round + 1);
+            else initMatchingGame(1);
+        }
+
+        let listeningState = { questions: [], currentIndex: 0, answered: false, hasMistake: false };
+
+        function initListeningGame() {
+            listeningState.questions = [...VOCAB_DATA].sort(() => Math.random() - 0.5).slice(0, 10);
+            listeningState.currentIndex = 0;
+            renderListeningQuestion();
+        }
+
+        function renderListeningQuestion() {
+            listeningState.answered = false;
+            listeningState.hasMistake = false;
+            const current = listeningState.questions[listeningState.currentIndex];
+
+            document.getElementById('listening-step').textContent = `${listeningState.currentIndex + 1} / ${listeningState.questions.length}`;
+            document.getElementById('listening-feedback').classList.add('hidden');
+            document.getElementById('listening-next-btn').classList.add('hidden');
+
+            const distractors = VOCAB_DATA.filter(v => v.id !== current.id).sort(() => Math.random() - 0.5).slice(0, 3);
+            const options = [current, ...distractors].sort(() => Math.random() - 0.5);
+
+            const optionsContainer = document.getElementById('listening-options');
+            optionsContainer.innerHTML = '';
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "w-full p-3.5 bg-slate-50 hover:bg-indigo-50 border-2 border-slate-200 rounded-xl font-bold text-slate-800 text-center transition";
+                btn.innerHTML = `<span class="text-lg">${opt.kr}</span>`;
+                btn.onclick = () => checkListeningAnswer(opt, current, btn);
+                optionsContainer.appendChild(btn);
+            });
+
+            setTimeout(() => playCurrentListeningAudio(), 300);
+        }
+
+        function playCurrentListeningAudio() {
+            speakKorean(listeningState.questions[listeningState.currentIndex].speak);
+        }
+
+        function checkListeningAnswer(selected, correct, btnElement) {
+            if (listeningState.answered) return;
+            const feedback = document.getElementById('listening-feedback');
+            feedback.classList.remove('hidden');
+
+            if (selected.id === correct.id) {
+                listeningState.answered = true;
+                document.querySelectorAll('#listening-options button').forEach(b => b.disabled = true);
+                btnElement.className = "w-full p-3.5 bg-emerald-100 border-2 border-emerald-500 text-emerald-900 rounded-xl font-bold text-center transition";
+                feedback.className = "p-3 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl font-bold text-xs text-center";
+                feedback.innerHTML = `<i class="fas fa-check-circle text-emerald-600 mr-1"></i> Chính xác! <strong>${correct.kr}</strong> [${correct.roman}] nghĩa là: <em>${correct.vi}</em>`;
+                
+                updateScore(listeningState.hasMistake ? 5 : 10);
+                document.getElementById('listening-next-btn').classList.remove('hidden');
+            } else {
+                listeningState.hasMistake = true;
+                btnElement.disabled = true;
+                btnElement.className = "w-full p-3.5 bg-rose-100 border-2 border-rose-300 text-rose-500 rounded-xl font-bold text-center transition line-through opacity-60 cursor-not-allowed";
+                feedback.className = "p-3 bg-rose-50 text-rose-800 border border-rose-200 rounded-xl font-bold text-xs text-center";
+                feedback.innerHTML = `<i class="fas fa-times-circle text-rose-600 mr-1"></i> Chưa đúng! Hãy nghe lại và chọn đáp án khác.`;
+            }
+        }
+
+        function nextListeningQuestion() {
+            if (listeningState.currentIndex < listeningState.questions.length - 1) {
+                listeningState.currentIndex++;
+                renderListeningQuestion();
+            } else {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+                showResultModal("Bạn đã hoàn thành các câu hỏi luyện nghe Vocab 4.1!");
+            }
+        }
+
+        let visualState = { questions: [], currentIndex: 0, answered: false, hasMistake: false };
+
+        function initVisualGame() {
+            visualState.questions = [...VOCAB_DATA].sort(() => Math.random() - 0.5).slice(0, 10);
+            visualState.currentIndex = 0;
+            renderVisualQuestion();
+        }
+
+        function renderVisualQuestion() {
+            visualState.answered = false;
+            visualState.hasMistake = false;
+            const current = visualState.questions[visualState.currentIndex];
+
+            document.getElementById('visual-step').textContent = `${visualState.currentIndex + 1} / ${visualState.questions.length}`;
+            document.getElementById('visual-icon').textContent = current.icon;
+            document.getElementById('visual-desc').textContent = `"${current.desc}"`;
+            document.getElementById('visual-feedback').classList.add('hidden');
+            document.getElementById('visual-next-btn').classList.add('hidden');
+
+            const distractors = VOCAB_DATA.filter(v => v.id !== current.id).sort(() => Math.random() - 0.5).slice(0, 3);
+            const options = [current, ...distractors].sort(() => Math.random() - 0.5);
+
+            const optionsContainer = document.getElementById('visual-options');
+            optionsContainer.innerHTML = '';
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "w-full p-3.5 bg-slate-50 hover:bg-indigo-50 border-2 border-slate-200 rounded-xl font-bold text-slate-800 text-center transition";
+                btn.innerHTML = `<span class="text-lg">${opt.kr}</span>`;
+                btn.onclick = () => checkVisualAnswer(opt, current, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkVisualAnswer(selected, correct, btnElement) {
+            if (visualState.answered) return;
+            const feedback = document.getElementById('visual-feedback');
+            feedback.classList.remove('hidden');
+
+            if (selected.id === correct.id) {
+                visualState.answered = true;
+                document.querySelectorAll('#visual-options button').forEach(b => b.disabled = true);
+                speakKorean(correct.speak);
+
+                btnElement.className = "w-full p-3.5 bg-emerald-100 border-2 border-emerald-500 text-emerald-900 rounded-xl font-bold text-center transition";
+                feedback.className = "p-3 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl font-bold text-xs text-center";
+                feedback.innerHTML = `<i class="fas fa-check-circle text-emerald-600 mr-1"></i> Chính xác! <strong>${correct.kr}</strong> [${correct.roman}] nghĩa là <em>${correct.vi}</em>.`;
+                
+                updateScore(visualState.hasMistake ? 5 : 10);
+                document.getElementById('visual-next-btn').classList.remove('hidden');
+            } else {
+                visualState.hasMistake = true;
+                btnElement.disabled = true;
+                btnElement.className = "w-full p-3.5 bg-rose-100 border-2 border-rose-300 text-rose-500 rounded-xl font-bold text-center transition line-through opacity-60 cursor-not-allowed";
+                feedback.className = "p-3 bg-rose-50 text-rose-800 border border-rose-200 rounded-xl font-bold text-xs text-center";
+                feedback.innerHTML = `<i class="fas fa-times-circle text-rose-600 mr-1"></i> Chưa đúng! Hãy chọn đáp án khác.`;
+            }
+        }
+
+        function nextVisualQuestion() {
+            if (visualState.currentIndex < visualState.questions.length - 1) {
+                visualState.currentIndex++;
+                renderVisualQuestion();
+            } else {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+                showResultModal("Bạn đã hoàn thành bài trắc nghiệm mô tả Vocab 4.1!");
+            }
+        }
+
+        function showResultModal(msg) {
+            document.getElementById('result-message').textContent = msg;
+            document.getElementById('modal-score').textContent = score;
+            document.getElementById('result-modal').classList.remove('hidden');
+        }
+
+        function closeResultModal() {
+            document.getElementById('result-modal').classList.add('hidden');
+            switchTab('study');
+        }
+
+        window.onload = function() {
+            renderFlashcards();
+            initMatchingGame(1);
+            initListeningGame();
+            initVisualGame();
+        };
+    </script>
+</body>
+</html>
