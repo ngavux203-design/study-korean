@@ -25,8 +25,8 @@
 
     /* --- SIDEBAR TRÁI --- */
     .sidebar {
-      width: 250px;
-      min-width: 250px;
+      width: 260px;
+      min-width: 260px;
       background: #ffffff;
       border-right: 1px solid #e2e8f0;
       display: flex;
@@ -54,6 +54,7 @@
       display: flex;
       flex-direction: column;
       gap: 4px;
+      margin-bottom: 8px;
     }
 
     .menu-tab {
@@ -160,9 +161,9 @@
       📚 Học Tiếng Hàn cùng Nga
     </div>
 
+    <!-- Nhóm 1: Vocab Trường học -->
     <div class="menu-group">
-      <!-- Tab Vocab Trường học -->
-      <button class="menu-tab active open" id="vocabToggle" onclick="toggleSubmenu()">
+      <button class="menu-tab active open" id="toggleSchool" onclick="toggleSubmenu('submenuSchool', 'toggleSchool')">
         <div class="tab-title">
           <span class="tab-icon">🏫</span>
           <span>Vocab Trường học</span>
@@ -170,13 +171,34 @@
         <span class="arrow">▼</span>
       </button>
 
-      <!-- Danh sách bài học con -->
-      <div class="submenu" id="vocabSubmenu">
+      <!-- Submenu Trường học -->
+      <div class="submenu" id="submenuSchool">
         <a href="./vocab2.1/" target="lesson-frame" class="selected" onclick="setActiveLink(this)">
           • Vocab 2.1
         </a>
         <a href="./vocab2.2/" target="lesson-frame" onclick="setActiveLink(this)">
           • Vocab 2.2
+        </a>
+      </div>
+    </div>
+
+    <!-- Nhóm 2: Vocab Ngày & Số -->
+    <div class="menu-group">
+      <button class="menu-tab open" id="toggleDate" onclick="toggleSubmenu('submenuDate', 'toggleDate')">
+        <div class="tab-title">
+          <span class="tab-icon">🗓️</span>
+          <span>Vocab Ngày & Số</span>
+        </div>
+        <span class="arrow">▼</span>
+      </button>
+
+      <!-- Submenu Ngày & Số -->
+      <div class="submenu" id="submenuDate">
+        <a href="./vocab4.1/" target="lesson-frame" onclick="setActiveLink(this)">
+          • Vocab 4.1: Ngày & Thời gian
+        </a>
+        <a href="./vocab4.2/" target="lesson-frame" onclick="setActiveLink(this)">
+          • Vocab 4.2: Số Hán Hàn
         </a>
       </div>
     </div>
@@ -188,9 +210,9 @@
   </main>
 
   <script>
-    function toggleSubmenu() {
-      const submenu = document.getElementById('vocabSubmenu');
-      const toggleBtn = document.getElementById('vocabToggle');
+    function toggleSubmenu(submenuId, toggleBtnId) {
+      const submenu = document.getElementById(submenuId);
+      const toggleBtn = document.getElementById(toggleBtnId);
       if (submenu.style.display === 'none') {
         submenu.style.display = 'flex';
         toggleBtn.classList.add('open');
