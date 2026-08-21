@@ -17,6 +17,9 @@
       justify-content: space-between;
       align-items: center;
       box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
+      position: sticky;
+      top: 0;
+      z-index: 50;
     }
     .header-left { display: flex; align-items: center; gap: 12px; }
     .badge { background: rgba(255, 255, 255, 0.2); padding: 4px 10px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; }
@@ -46,7 +49,7 @@
 
     /* Main Container */
     .main-container { flex: 1; padding: 24px 32px; width: 100%; max-width: 1400px; margin: 0 auto; }
-    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
     .section-info h3 { font-size: 1.25rem; font-weight: 700; color: #1e1b4b; display: flex; align-items: center; gap: 8px; }
     .section-info p { font-size: 0.875rem; color: #64748b; margin-top: 4px; }
     
@@ -64,13 +67,26 @@
       transition: all 0.2s;
     }
     .btn-action:hover { background: #4338ca; transform: translateY(-1px); }
+    .btn-stop { background: #e11d48 !important; }
+    .btn-stop:hover { background: #be123c !important; }
 
-    /* Tab Content Modules */
-    .tab-content { display: none; }
-    .tab-content.active { display: block; animation: fadeIn 0.25s ease-in-out; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    /* Active Speech Banner */
+    .speech-banner {
+      background: #312e81;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid #4338ca;
+      box-shadow: 0 4px 12px rgba(49, 46, 129, 0.2);
+    }
+    .speech-banner.active { display: flex; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.85; } }
 
-    /* 1. Flashcard Grid */
+    /* Flashcard Grid */
     .cards-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -78,13 +94,13 @@
     }
     .card {
       background: white;
-      border: 1px solid #e2e8f0;
+      border: 2px solid #e2e8f0;
       border-radius: 16px;
       padding: 20px 16px;
       text-align: center;
       position: relative;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 0 2px 6px rgba(0,0,0,0.02);
     }
     .card:hover { transform: translateY(-4px); box-shadow: 0 8px 18px rgba(0,0,0,0.06); border-color: #cbd5e1; }
@@ -110,8 +126,26 @@
     }
     .speaker-btn:hover { background: #e0e7ff; }
 
-    /* 2. Match Game */
-    .match-container { display: flex; gap: 40px; justify-content: center; margin-top: 20px; }
+    /* Synchronized Highlight Glow Effect */
+    @keyframes activeGlow {
+      0%, 100% {
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.4), 0 10px 25px -5px rgba(79, 70, 229, 0.3);
+        transform: translateY(-4px) scale(1.04);
+      }
+      50% {
+        box-shadow: 0 0 0 6px rgba(99, 102, 241, 0.6), 0 12px 28px -5px rgba(79, 70, 229, 0.4);
+        transform: translateY(-6px) scale(1.05);
+      }
+    }
+    .card-active {
+      animation: activeGlow 1.2s infinite ease-in-out;
+      border-color: #4f46e5 !important;
+      background: linear-gradient(135deg, #ffffff 0%, #eef2ff 100%) !important;
+      z-index: 20;
+    }
+
+    /* Match Game */
+    .match-container { display: flex; gap: 40px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
     .match-col { display: flex; flex-direction: column; gap: 12px; width: 280px; }
     .match-item {
       padding: 16px;
@@ -125,9 +159,9 @@
     }
     .match-item:hover { border-color: #94a3b8; }
     .match-item.selected { border-color: #4f46e5; background: #eef2ff; color: #4f46e5; }
-    .match-item.matched { border-color: #16a34a; background: #dcfce7; color: #16a34a; cursor: default; }
+    .match-item.matched { border-color: #16a34a; background: #dcfce7; color: #16a34a; cursor: default; opacity: 0.6; }
 
-    /* 3 & 4. Quiz & Listen */
+    /* Quiz Box */
     .quiz-box {
       background: white;
       max-width: 600px;
@@ -150,6 +184,20 @@
       transition: all 0.2s;
     }
     .quiz-opt-btn:hover { border-color: #4f46e5; background: #eef2ff; }
+    .feedback-msg {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      display: none;
+    }
+    .feedback-correct { background: #dcfce7; color: #15803d; border: 1px solid #86efac; display: block; }
+    .feedback-wrong { background: #ffe4e6; color: #be123c; border: 1px solid #fca5a5; display: block; }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeIn 0.25s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
 <body>
@@ -158,7 +206,7 @@
     <div class="header-left">
       <span class="badge">KR</span>
       <div class="header-title">
-        <h2>Học Từ Vựng Tiếng Hàn</h2>
+        <h2>Học Từ Vựng Tiếng Hàn (Vocab 2.1)</h2>
         <p>Chủ đề: Đồ vật trong phòng học (교실 물건)</p>
       </div>
     </div>
@@ -179,10 +227,24 @@
       <div class="section-header">
         <div class="section-info">
           <h3>🎓 Danh Sách 15 Từ Vựng Đồ Vật Phòng Học</h3>
-          <p>Bấm nút loa để nghe giọng phát âm chuẩn Hangul (ko-KR) hoặc bấm vào thẻ để nghe lại.</p>
+          <p>Bấm <strong>Nghe tự động</strong>: Âm thanh đọc tới đâu, thẻ từ vựng tương ứng sẽ tự động <strong>sáng nổi bật & cuộn tới đó</strong>!</p>
         </div>
-        <button class="btn-action" onclick="playAllVocab()">▶ Nghe lần lượt tất cả</button>
+        <button id="btnPlayAll" class="btn-action" onclick="togglePlayAllVocab()">
+          <span id="btnPlayAllIcon">▶</span> <span id="btnPlayAllText">Nghe lần lượt (Đọc tới đâu show tới đó)</span>
+        </button>
       </div>
+
+      <!-- Live Speech Progress Banner -->
+      <div id="speechBanner" class="speech-banner">
+        <div>
+          <span style="font-size: 0.75rem; color: #a5b4fc; text-transform: uppercase; font-weight: 700; display: block;">Đang phát tự động</span>
+          <strong id="speechWordText" style="font-size: 1rem; color: #fde047;">책상 [chaek-sang] - Cái bàn</strong>
+        </div>
+        <button onclick="stopPlayAll()" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 8px; font-weight: 700; cursor: pointer;">
+          ✕ Dừng
+        </button>
+      </div>
+
       <div class="cards-grid" id="vocabGrid"></div>
     </section>
 
@@ -207,6 +269,7 @@
         <h3 style="margin-bottom: 12px;">🔊 Nghe và chọn từ chính xác</h3>
         <button class="btn-action" style="margin: 16px auto;" onclick="playCurrentListenSound()">🔈 Nghe Lại Âm Thanh</button>
         <div class="quiz-options" id="listenOptions"></div>
+        <div id="listenFeedback" class="feedback-msg"></div>
       </div>
     </section>
 
@@ -216,44 +279,125 @@
         <div id="quizIcon" style="font-size: 4rem; margin-bottom: 10px;"></div>
         <h3 id="quizQuestion" style="margin-bottom: 16px;">Đồ vật này tiếng Hàn là gì?</h3>
         <div class="quiz-options" id="quizOptions"></div>
+        <div id="quizFeedback" class="feedback-msg"></div>
       </div>
     </section>
   </main>
 
   <script>
     const vocabData = [
-      { kr: "책상", pron: "[chaek-sang]", vi: "Cái bàn", icon: "🪵" },
-      { kr: "의자", pron: "[ui-ja]", vi: "Cái ghế", icon: "🪑" },
-      { kr: "칠판", pron: "[chil-pan]", vi: "Bảng", icon: "📋" },
-      { kr: "문", pron: "[mun]", vi: "Cửa", icon: "🚪" },
-      { kr: "창문", pron: "[chang-mun]", vi: "Cửa sổ", icon: "🪟" },
-      { kr: "시계", pron: "[si-gye]", vi: "Đồng hồ", icon: "⏰" },
-      { kr: "가방", pron: "[ga-bang]", vi: "Cặp sách, ba lô", icon: "🎒" },
-      { kr: "컴퓨터", pron: "[keom-pyu-teo]", vi: "Máy vi tính", icon: "🖥️" },
-      { kr: "책", pron: "[chaek]", vi: "Sách", icon: "📖" },
-      { kr: "공책", pron: "[gong-chaek]", vi: "Vở", icon: "📓" },
-      { kr: "사전", pron: "[sa-jeon]", vi: "Từ điển", icon: "📕" },
-      { kr: "지우개", pron: "[ji-u-gae]", vi: "Cục tẩy, hòn tẩy", icon: "✏️" },
-      { kr: "지도", pron: "[ji-do]", vi: "Bản đồ", icon: "🗺️" },
-      { kr: "펜", pron: "[pen]", vi: "Bút, viết", icon: "🖊️" },
-      { kr: "필통", pron: "[pil-tong]", vi: "Hộp bút", icon: "👝" }
+      { id: 1, kr: "책상", pron: "[chaek-sang]", vi: "Cái bàn", icon: "🪵" },
+      { id: 2, kr: "의자", pron: "[ui-ja]", vi: "Cái ghế", icon: "🪑" },
+      { id: 3, kr: "칠판", pron: "[chil-pan]", vi: "Bảng", icon: "📋" },
+      { id: 4, kr: "문", pron: "[mun]", vi: "Cửa", icon: "🚪" },
+      { id: 5, kr: "창문", pron: "[chang-mun]", vi: "Cửa sổ", icon: "🪟" },
+      { id: 6, kr: "시계", pron: "[si-gye]", vi: "Đồng hồ", icon: "⏰" },
+      { id: 7, kr: "가방", pron: "[ga-bang]", vi: "Cặp sách, ba lô", icon: "🎒" },
+      { id: 8, kr: "컴퓨터", pron: "[keom-pyu-teo]", vi: "Máy vi tính", icon: "🖥️" },
+      { id: 9, kr: "책", pron: "[chaek]", vi: "Sách", icon: "📖" },
+      { id: 10, kr: "공책", pron: "[gong-chaek]", vi: "Vở", icon: "📓" },
+      { id: 11, kr: "사전", pron: "[sa-jeon]", vi: "Từ điển", icon: "📕" },
+      { id: 12, kr: "지우개", pron: "[ji-u-gae]", vi: "Cục tẩy, hòn tẩy", icon: "✏️" },
+      { id: 13, kr: "지도", pron: "[ji-do]", vi: "Bản đồ", icon: "🗺️" },
+      { id: 14, kr: "펜", pron: "[pen]", vi: "Bút, viết", icon: "🖊️" },
+      { id: 15, kr: "필통", pron: "[pil-tong]", vi: "Hộp bút", icon: "👝" }
     ];
 
     let score = 0;
+    let isPlayingAll = false;
+    let playAllTimeout = null;
 
-    function speak(text) {
+    function speak(text, onEndCallback = null) {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'ko-KR';
         utterance.rate = 0.85;
+
+        let callbackCalled = false;
+        const handleEnd = () => {
+          if (!callbackCalled && onEndCallback) {
+            callbackCalled = true;
+            onEndCallback();
+          }
+        };
+
+        utterance.onend = handleEnd;
+        utterance.onerror = handleEnd;
         window.speechSynthesis.speak(utterance);
+
+        if (onEndCallback) {
+          setTimeout(handleEnd, (text.length * 400) + 900);
+        }
       }
     }
 
+    function togglePlayAllVocab() {
+      if (isPlayingAll) stopPlayAll();
+      else startPlayAll();
+    }
+
+    function startPlayAll() {
+      isPlayingAll = true;
+      const btn = document.getElementById('btnPlayAll');
+      btn.className = "btn-action btn-stop";
+      document.getElementById('btnPlayAllIcon').textContent = "⏹";
+      document.getElementById('btnPlayAllText').textContent = "Dừng phát tự động";
+      document.getElementById('speechBanner').classList.add('active');
+
+      let idx = 0;
+
+      function playStep() {
+        if (!isPlayingAll || idx >= vocabData.length) {
+          stopPlayAll();
+          return;
+        }
+
+        const currentItem = vocabData[idx];
+
+        // Highlight card & auto-scroll
+        document.querySelectorAll('.card').forEach(c => c.classList.remove('card-active'));
+        const activeCard = document.getElementById(`card-${currentItem.id}`);
+        if (activeCard) {
+          activeCard.classList.add('card-active');
+          activeCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Update progress banner
+        document.getElementById('speechWordText').textContent = `(${idx + 1}/${vocabData.length}) ${currentItem.kr} ${currentItem.pron} - ${currentItem.vi}`;
+
+        speak(currentItem.kr, () => {
+          if (isPlayingAll) {
+            playAllTimeout = setTimeout(() => {
+              idx++;
+              playStep();
+            }, 600);
+          }
+        });
+      }
+
+      playStep();
+    }
+
+    function stopPlayAll() {
+      isPlayingAll = false;
+      clearTimeout(playAllTimeout);
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+
+      const btn = document.getElementById('btnPlayAll');
+      btn.className = "btn-action";
+      document.getElementById('btnPlayAllIcon').textContent = "▶";
+      document.getElementById('btnPlayAllText').textContent = "Nghe lần lượt (Đọc tới đâu show tới đó)";
+      document.getElementById('speechBanner').classList.remove('active');
+
+      document.querySelectorAll('.card').forEach(c => c.classList.remove('card-active'));
+    }
+
     function switchTab(tabId) {
+      stopPlayAll();
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      
       event.currentTarget.classList.add('active');
       document.getElementById('tab-' + tabId).classList.add('active');
 
@@ -267,9 +411,10 @@
     vocabData.forEach(item => {
       const card = document.createElement('div');
       card.className = 'card';
-      card.onclick = () => speak(item.kr);
+      card.id = `card-${item.id}`;
+      card.onclick = () => { stopPlayAll(); speak(item.kr); };
       card.innerHTML = `
-        <button class="speaker-btn" onclick="event.stopPropagation(); speak('${item.kr}')">🔊</button>
+        <button class="speaker-btn" onclick="event.stopPropagation(); stopPlayAll(); speak('${item.kr}')">🔊</button>
         <div class="card-icon">${item.icon}</div>
         <div class="card-korean">${item.kr}</div>
         <div class="card-pron">${item.pron}</div>
@@ -278,14 +423,6 @@
       vocabGrid.appendChild(card);
     });
 
-    async function playAllVocab() {
-      for (const item of vocabData) {
-        speak(item.kr);
-        await new Promise(r => setTimeout(r, 1600));
-      }
-    }
-
-    // Tab 2: Match Game
     let selectedKr = null, selectedVi = null;
     function initMatchGame() {
       const krCol = document.getElementById('koreanMatchCol');
@@ -299,6 +436,7 @@
         btn.innerText = item.kr;
         btn.onclick = () => {
           if (btn.classList.contains('matched')) return;
+          speak(item.kr);
           document.querySelectorAll('#koreanMatchCol .match-item').forEach(b => b.classList.remove('selected'));
           btn.classList.add('selected');
           selectedKr = item;
@@ -338,11 +476,13 @@
     // Tab 3: Listen Quiz
     let currentListenTarget = null;
     function initListenQuiz() {
+      const fb = document.getElementById('listenFeedback');
+      fb.className = 'feedback-msg';
       const item = vocabData[Math.floor(Math.random() * vocabData.length)];
       currentListenTarget = item;
       speak(item.kr);
       
-      const options = [item, ...vocabData.filter(v => v !== item).sort(() => 0.5 - Math.random()).slice(0, 3)].sort(() => 0.5 - Math.random());
+      const options = [item, ...vocabData.filter(v => v.id !== item.id).sort(() => 0.5 - Math.random()).slice(0, 3)].sort(() => 0.5 - Math.random());
       const container = document.getElementById('listenOptions');
       container.innerHTML = '';
       options.forEach(opt => {
@@ -351,11 +491,15 @@
         btn.innerText = opt.vi;
         btn.onclick = () => {
           if (opt.kr === item.kr) {
-            alert('🎉 Chính xác!');
+            fb.textContent = `🎉 Chính xác! Từ được đọc là: ${item.kr} (${item.pron})`;
+            fb.className = 'feedback-msg feedback-correct';
             score += 10;
             document.getElementById('scoreDisplay').innerText = score;
-            initListenQuiz();
-          } else alert('❌ Sai rồi, thử lại nhé!');
+            setTimeout(initListenQuiz, 1500);
+          } else {
+            fb.textContent = `❌ Chưa chính xác, hãy bấm nút loa để nghe lại nhé!`;
+            fb.className = 'feedback-msg feedback-wrong';
+          }
         };
         container.appendChild(btn);
       });
@@ -364,9 +508,11 @@
 
     // Tab 4: Visual Quiz
     function initVisualQuiz() {
+      const fb = document.getElementById('quizFeedback');
+      fb.className = 'feedback-msg';
       const item = vocabData[Math.floor(Math.random() * vocabData.length)];
       document.getElementById('quizIcon').innerText = item.icon;
-      const options = [item, ...vocabData.filter(v => v !== item).sort(() => 0.5 - Math.random()).slice(0, 3)].sort(() => 0.5 - Math.random());
+      const options = [item, ...vocabData.filter(v => v.id !== item.id).sort(() => 0.5 - Math.random()).slice(0, 3)].sort(() => 0.5 - Math.random());
       const container = document.getElementById('quizOptions');
       container.innerHTML = '';
       options.forEach(opt => {
@@ -376,11 +522,15 @@
         btn.onclick = () => {
           if (opt.kr === item.kr) {
             speak(opt.kr);
-            alert('🎉 Chính xác!');
+            fb.textContent = `🎉 Chính xác! ${opt.kr} là ${opt.vi}`;
+            fb.className = 'feedback-msg feedback-correct';
             score += 10;
             document.getElementById('scoreDisplay').innerText = score;
-            initVisualQuiz();
-          } else alert('❌ Sai rồi, thử lại nhé!');
+            setTimeout(initVisualQuiz, 1500);
+          } else {
+            fb.textContent = `❌ Thử lại đáp án khác nhé!`;
+            fb.className = 'feedback-msg feedback-wrong';
+          }
         };
         container.appendChild(btn);
       });
